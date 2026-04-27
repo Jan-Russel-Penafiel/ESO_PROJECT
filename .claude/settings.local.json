@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -r \"echo 'admin: ' . password_hash\\('Admin@123', PASSWORD_BCRYPT\\) . PHP_EOL; echo 'student: ' . password_hash\\('Student@123', PASSWORD_BCRYPT\\) . PHP_EOL;\")",
+      "Bash(/c/xampp/mysql/bin/mysql.exe -uroot -e \"SOURCE c:/xampp/htdocs/fine/database/schema.sql; USE eso_fines; SHOW TABLES; SELECT id, username, role FROM users;\")",
+      "Bash(/c/xampp/mysql/bin/mysql.exe -uroot -e \"DROP DATABASE IF EXISTS eso_fines; SOURCE c:/xampp/htdocs/fine/database/schema.sql;\")",
+      "Bash(php -r ' *)",
+      "Bash(php -l /c/xampp/htdocs/fine/student/pay.php)",
+      "Bash(php -l /c/xampp/htdocs/fine/admin/fines.php)",
+      "Bash(php -l /c/xampp/htdocs/fine/actions/submit_payment_ref.php)",
+      "Bash(php -l /c/xampp/htdocs/fine/templates/sidebar.php)"
+    ]
+  }
+}
