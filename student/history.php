@@ -21,6 +21,8 @@ include __DIR__ . '/../templates/sidebar.php';
 <h1 class="text-2xl font-bold text-emerald-800 mb-6"><i class="bi bi-clock-history"></i> Payment History</h1>
 
 <div class="bg-white rounded-lg shadow overflow-hidden">
+  <!-- Desktop table -->
+  <div class="overflow-x-auto desktop-table">
   <table class="w-full text-sm">
     <thead class="bg-emerald-50 text-emerald-800">
       <tr>
@@ -52,6 +54,42 @@ include __DIR__ . '/../templates/sidebar.php';
     <?php endif; ?>
     </tbody>
   </table>
+  </div>
+  <!-- Mobile cards -->
+  <div class="mobile-cards">
+    <?php if (!$rows): ?>
+      <p class="text-center text-slate-400 py-4">No payments yet.</p>
+    <?php endif; ?>
+    <?php foreach ($rows as $p):
+      $cls = ['initiated'=>'bg-slate-100 text-slate-700','pending'=>'bg-amber-100 text-amber-700','success'=>'bg-emerald-100 text-emerald-700','failed'=>'bg-red-100 text-red-700'][$p['status']];
+    ?>
+      <div class="record-card">
+        <div class="card-row" style="margin-bottom:.45rem;">
+          <div>
+            <div class="font-semibold text-slate-800"><?= e($p['reason']) ?></div>
+            <div class="font-mono text-xs text-slate-400"><?= e($p['reference_no']) ?></div>
+          </div>
+          <span class="text-xs px-2 py-1 rounded <?= $cls ?>"><?= e(ucfirst($p['status'])) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Amount</span>
+          <span class="card-val font-mono font-semibold text-slate-800"><?= peso($p['amount']) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Method</span>
+          <span class="card-val"><?= e($p['payment_method']) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">GCash Ref</span>
+          <span class="card-val font-mono"><?= e($p['gcash_ref'] ?: '—') ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Date</span>
+          <span class="card-val text-slate-500"><?= e(fdate($p['created_at'])) ?></span>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
 </div>
 
 <?php include __DIR__ . '/../templates/footer.php'; ?>

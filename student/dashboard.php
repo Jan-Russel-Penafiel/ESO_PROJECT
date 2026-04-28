@@ -58,7 +58,8 @@ include __DIR__ . '/../templates/sidebar.php';
   <div class="p-4 border-b font-semibold text-emerald-700">
     <i class="bi bi-exclamation-circle"></i> Active Fines
   </div>
-  <div class="overflow-x-auto">
+  <!-- Desktop table -->
+  <div class="overflow-x-auto desktop-table">
   <table class="w-full text-sm min-w-[480px]">
     <thead class="bg-emerald-50 text-emerald-800">
       <tr>
@@ -98,7 +99,47 @@ include __DIR__ . '/../templates/sidebar.php';
     <?php endif; ?>
     </tbody>
   </table>
-</div>
+  </div>
+  <!-- Mobile cards -->
+  <div class="mobile-cards">
+    <?php if (!$activeFines): ?>
+      <div class="text-center text-slate-400 py-6">
+        <i class="bi bi-emoji-smile" style="font-size:2rem;color:#34d399;display:block;margin-bottom:.5rem;"></i>
+        No active fines. You're all clear!
+      </div>
+    <?php endif; ?>
+    <?php foreach ($activeFines as $f):
+      $cls = ['unpaid'=>'bg-red-100 text-red-700','pending'=>'bg-amber-100 text-amber-700'][$f['status']] ?? 'bg-slate-100 text-slate-700';
+    ?>
+      <div class="record-card">
+        <div class="card-row" style="margin-bottom:.45rem;">
+          <div>
+            <div class="font-semibold text-slate-800"><?= e($f['reason']) ?></div>
+            <div class="text-xs text-slate-400"><?= e($f['category_name'] ?? 'Custom') ?></div>
+          </div>
+          <span class="text-xs px-2 py-1 rounded <?= $cls ?>"><?= e(ucfirst($f['status'])) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Amount</span>
+          <span class="card-val font-mono font-semibold text-slate-800"><?= peso($f['amount']) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Issued</span>
+          <span class="card-val text-slate-500"><?= e(fdate($f['issued_at'], 'M d, Y')) ?></span>
+        </div>
+        <div class="card-actions">
+          <?php if ($f['status'] === 'unpaid'): ?>
+            <a href="<?= APP_URL ?>/student/pay.php?fine_id=<?= $f['id'] ?>"
+               class="inline-flex items-center gap-1 bg-emerald-600 text-white text-xs px-3 py-1.5 rounded">
+              <i class="bi bi-qr-code"></i> Pay via GCash
+            </a>
+          <?php else: ?>
+            <span class="text-xs text-amber-600"><i class="bi bi-hourglass-split"></i> Awaiting verification</span>
+          <?php endif; ?>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
 
 <script>
   // Refresh page silently every 15s to reflect status changes

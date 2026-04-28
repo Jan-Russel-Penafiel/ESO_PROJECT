@@ -60,7 +60,8 @@ include __DIR__ . '/../templates/sidebar.php';
       </select>
     </form>
   </div>
-  <div class="overflow-x-auto">
+  <!-- Desktop table -->
+  <div class="overflow-x-auto desktop-table">
     <table class="w-full text-sm min-w-[720px]">
       <thead class="bg-emerald-50 text-emerald-800">
         <tr>
@@ -107,6 +108,59 @@ include __DIR__ . '/../templates/sidebar.php';
       <?php endif; ?>
       </tbody>
     </table>
+  </div>
+  <!-- Mobile cards -->
+  <div class="mobile-cards">
+    <?php if (!$payments): ?>
+      <p class="text-center text-slate-400 py-4">No payment records.</p>
+    <?php endif; ?>
+    <?php foreach ($payments as $p):
+      $cls = ['initiated'=>'bg-slate-100 text-slate-700','pending'=>'bg-amber-100 text-amber-700','success'=>'bg-emerald-100 text-emerald-700','failed'=>'bg-red-100 text-red-700'][$p['status']];
+    ?>
+      <div class="record-card">
+        <div class="card-row" style="margin-bottom:.45rem;">
+          <div>
+            <div class="font-semibold text-slate-800"><?= e($p['full_name']) ?></div>
+            <div class="text-xs text-slate-400"><?= e($p['student_no']) ?></div>
+          </div>
+          <span class="text-xs px-2 py-1 rounded <?= $cls ?>"><?= e(ucfirst($p['status'])) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Ref</span>
+          <span class="card-val font-mono"><?= e($p['reference_no']) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Fine</span>
+          <span class="card-val"><?= e($p['reason']) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Amount</span>
+          <span class="card-val font-mono font-semibold text-slate-800"><?= peso($p['amount']) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Method</span>
+          <span class="card-val"><?= e($p['payment_method']) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">GCash Ref</span>
+          <span class="card-val font-mono"><?= e($p['gcash_ref'] ?: '—') ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Date</span>
+          <span class="card-val text-slate-500"><?= e(fdate($p['created_at'], 'M d, h:i A')) ?></span>
+        </div>
+        <?php if (in_array($p['status'], ['initiated','pending'], true)): ?>
+          <div class="card-actions">
+            <a href="<?= APP_URL ?>/actions/payment_verify.php?id=<?= $p['id'] ?>&_csrf=<?= csrf_token() ?>"
+               onclick="return confirm('Verify and mark this payment SUCCESS?')"
+               class="text-emerald-600 text-xs border border-emerald-200 px-2 py-1 rounded"><i class="bi bi-check2-circle"></i> Verify</a>
+            <a href="<?= APP_URL ?>/actions/payment_fail.php?id=<?= $p['id'] ?>&_csrf=<?= csrf_token() ?>"
+               onclick="return confirm('Mark this payment FAILED?')"
+               class="text-red-600 text-xs border border-red-200 px-2 py-1 rounded"><i class="bi bi-x-circle"></i> Fail</a>
+          </div>
+        <?php endif; ?>
+      </div>
+    <?php endforeach; ?>
   </div>
 </div>
 

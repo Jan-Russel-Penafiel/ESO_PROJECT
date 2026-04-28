@@ -11,29 +11,28 @@ $user = current_user();
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= e($pageTitle) ?> · <?= e(APP_NAME) ?></title>
 
-<!-- Tailwind CSS via CDN (theme: emerald + white) -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: { brand: { DEFAULT: '#059669', dark: '#047857', light: '#d1fae5' } }
-      }
-    }
-  };
-</script>
+<!-- Tailwind CSS (local) -->
+<link rel="stylesheet" href="<?= APP_URL ?>/assets/css/tailwind.css">
 
-<!-- Bootstrap Icons for menu/icon glyphs -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<!-- Bootstrap Icons (local) -->
+<link rel="stylesheet" href="<?= APP_URL ?>/assets/css/bootstrap-icons.css">
 
 <style>
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
   .sidebar-hidden { transform: translateX(-100%); }
   main table th, main table td { text-align: center !important; vertical-align: middle; }
   @media (min-width: 768px) { .sidebar-hidden { transform: none; } }
-  /* Compact table cells on mobile */
+  /* Mobile record cards */
+  .mobile-cards { display: none; }
   @media (max-width: 639px) {
-    main table th, main table td { padding: 6px 5px !important; font-size: 0.72rem !important; }
+    .desktop-table { display: none !important; }
+    .mobile-cards  { display: grid; gap: 0.75rem; padding: 0.75rem; }
+    .record-card   { background:#fff; border:1px solid #d1fae5; border-radius:0.5rem; padding:0.75rem; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+    .record-card .card-row { display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; margin-bottom:0.35rem; font-size:0.78rem; }
+    .record-card .card-row:last-child { margin-bottom:0; }
+    .record-card .card-label { color:#64748b; font-size:0.7rem; text-transform:uppercase; letter-spacing:.03em; flex-shrink:0; }
+    .record-card .card-val   { text-align:right; font-size:0.78rem; }
+    .record-card .card-actions { margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid #d1fae5; display:flex; gap:0.5rem; justify-content:flex-end; }
   }
 </style>
 </head>
@@ -46,7 +45,7 @@ $user = current_user();
       <button id="sidebarToggle" class="md:hidden text-emerald-700 text-2xl"><i class="bi bi-list"></i></button>
       <a href="<?= APP_URL ?>" class="flex items-center gap-2">
         <span class="bg-emerald-600 text-white p-2 rounded-lg"><i class="bi bi-shield-check"></i></span>
-        <span class="font-bold text-emerald-700 hidden sm:block">ESO Fines</span>
+        <span class="font-bold text-emerald-700">ESO Fines</span>
       </a>
     </div>
     <div class="flex items-center gap-3">

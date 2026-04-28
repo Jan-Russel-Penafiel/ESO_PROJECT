@@ -63,8 +63,8 @@ include __DIR__ . '/../templates/sidebar.php';
     </div>
     <div class="flex gap-2">
       <button class="bg-emerald-600 text-white px-3 py-1.5 rounded"><i class="bi bi-funnel"></i> Apply</button>
-      <a href="<?= APP_URL ?>/actions/export_csv.php?from=<?= urlencode($from) ?>&to=<?= urlencode($to) ?>"
-         class="bg-emerald-700 text-white px-3 py-1.5 rounded"><i class="bi bi-download"></i> Export CSV</a>
+      <a href="<?= APP_URL ?>/actions/export_xlsx.php?from=<?= urlencode($from) ?>&to=<?= urlencode($to) ?>"
+         class="bg-emerald-700 text-white px-3 py-1.5 rounded"><i class="bi bi-file-earmark-excel"></i> Export XLSX</a>
     </div>
   </form>
 </div>
@@ -89,7 +89,8 @@ foreach (['unpaid','pending','paid','cancelled'] as $st):
 
   <div class="bg-white rounded-lg shadow">
     <div class="p-4 border-b font-semibold text-emerald-700"><i class="bi bi-bar-chart"></i> Top Categories</div>
-    <div class="overflow-x-auto">
+    <!-- Desktop table -->
+    <div class="overflow-x-auto desktop-table">
     <table class="w-full text-sm min-w-[280px]">
       <thead class="bg-emerald-50 text-emerald-800">
         <tr><th class="text-left p-2">Category</th><th class="text-right p-2">Count</th><th class="text-right p-2">Total</th></tr>
@@ -107,11 +108,30 @@ foreach (['unpaid','pending','paid','cancelled'] as $st):
       </tbody>
     </table>
     </div>
+    <!-- Mobile cards -->
+    <div class="mobile-cards">
+      <?php if (!$topCategories): ?>
+        <p class="text-center text-slate-400 py-4">No data.</p>
+      <?php endif; ?>
+      <?php foreach ($topCategories as $c): ?>
+        <div class="record-card">
+          <div class="card-row" style="margin-bottom:.35rem;">
+            <span class="font-semibold text-slate-800"><?= e($c['name']) ?></span>
+            <span class="font-mono font-semibold text-emerald-700"><?= peso($c['total']) ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Count</span>
+            <span class="card-val"><?= e($c['cnt']) ?> fine(s)</span>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
   </div>
 
   <div class="bg-white rounded-lg shadow">
     <div class="p-4 border-b font-semibold text-emerald-700"><i class="bi bi-person-bounding-box"></i> Top Offenders</div>
-    <div class="overflow-x-auto">
+    <!-- Desktop table -->
+    <div class="overflow-x-auto desktop-table">
     <table class="w-full text-sm min-w-[280px]">
       <thead class="bg-emerald-50 text-emerald-800">
         <tr><th class="text-left p-2">Student</th><th class="text-right p-2">Count</th><th class="text-right p-2">Total</th></tr>
@@ -129,12 +149,34 @@ foreach (['unpaid','pending','paid','cancelled'] as $st):
       </tbody>
     </table>
     </div>
+    <!-- Mobile cards -->
+    <div class="mobile-cards">
+      <?php if (!$topStudents): ?>
+        <p class="text-center text-slate-400 py-4">No data.</p>
+      <?php endif; ?>
+      <?php foreach ($topStudents as $s): ?>
+        <div class="record-card">
+          <div class="card-row" style="margin-bottom:.35rem;">
+            <div>
+              <div class="font-semibold text-slate-800"><?= e($s['full_name']) ?></div>
+              <div class="text-xs text-slate-400"><?= e($s['student_no']) ?></div>
+            </div>
+            <span class="font-mono font-semibold text-emerald-700"><?= peso($s['total']) ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Fines</span>
+            <span class="card-val"><?= e($s['cnt']) ?> fine(s)</span>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
   </div>
 </div>
 
 <div class="bg-white rounded-lg shadow">
   <div class="p-4 border-b font-semibold text-emerald-700"><i class="bi bi-calendar-week"></i> Daily Collection</div>
-  <div class="overflow-x-auto">
+  <!-- Desktop table -->
+  <div class="overflow-x-auto desktop-table">
   <table class="w-full text-sm min-w-[280px]">
     <thead class="bg-emerald-50 text-emerald-800">
       <tr><th class="text-left p-2">Date</th><th class="text-right p-2">Collected</th></tr>
@@ -150,6 +192,24 @@ foreach (['unpaid','pending','paid','cancelled'] as $st):
     <?php endif; ?>
     </tbody>
   </table>
+  </div>
+  <!-- Mobile cards -->
+  <div class="mobile-cards">
+    <?php if (!$daily): ?>
+      <p class="text-center text-slate-400 py-4">No collections recorded.</p>
+    <?php endif; ?>
+    <?php foreach ($daily as $d): ?>
+      <div class="record-card">
+        <div class="card-row">
+          <span class="card-label">Date</span>
+          <span class="font-medium text-slate-700"><?= e(fdate($d['day'], 'D · M d, Y')) ?></span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Collected</span>
+          <span class="font-mono font-semibold text-emerald-700"><?= peso($d['total']) ?></span>
+        </div>
+      </div>
+    <?php endforeach; ?>
   </div>
 </div>
 

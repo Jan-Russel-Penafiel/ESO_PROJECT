@@ -51,7 +51,8 @@ include __DIR__ . '/../templates/sidebar.php';
     <div class="p-4 border-b">
       <h2 class="font-semibold text-emerald-700">Category List (<?= count($rows) ?>)</h2>
     </div>
-    <div class="overflow-x-auto">
+    <!-- Desktop table -->
+    <div class="overflow-x-auto desktop-table">
     <table class="w-full text-sm min-w-[360px]">
       <thead class="bg-emerald-50 text-emerald-800">
         <tr><th class="text-left p-2">Name</th><th class="text-right p-2">Default Amount</th><th class="text-left p-2">Description</th><th class="p-2">Actions</th></tr>
@@ -74,6 +75,32 @@ include __DIR__ . '/../templates/sidebar.php';
       <?php endif; ?>
       </tbody>
     </table>
+    </div>
+    <!-- Mobile cards -->
+    <div class="mobile-cards">
+      <?php if (!$rows): ?>
+        <p class="text-center text-slate-400 py-4">No categories yet.</p>
+      <?php endif; ?>
+      <?php foreach ($rows as $r): ?>
+        <div class="record-card">
+          <div class="card-row" style="margin-bottom:.45rem;">
+            <span class="font-semibold text-slate-800"><?= e($r['name']) ?></span>
+            <span class="font-mono font-semibold text-emerald-700"><?= peso($r['default_amount']) ?></span>
+          </div>
+          <?php if ($r['description']): ?>
+          <div class="card-row">
+            <span class="card-label">Description</span>
+            <span class="card-val text-slate-500"><?= e($r['description']) ?></span>
+          </div>
+          <?php endif; ?>
+          <div class="card-actions">
+            <a href="?edit=<?= $r['id'] ?>" class="text-amber-600 text-xs border border-amber-200 px-2 py-1 rounded"><i class="bi bi-pencil"></i> Edit</a>
+            <a href="<?= APP_URL ?>/actions/category_delete.php?id=<?= $r['id'] ?>&_csrf=<?= csrf_token() ?>"
+               onclick="return confirm('Delete this category?')"
+               class="text-red-600 text-xs border border-red-200 px-2 py-1 rounded"><i class="bi bi-trash"></i> Delete</a>
+          </div>
+        </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </div>

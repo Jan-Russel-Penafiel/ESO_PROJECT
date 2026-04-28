@@ -1,0 +1,26 @@
+{
+  "name": "fine",
+  "version": "1.0.0",
+  "description": "A web-based fines tracking and collection portal for the **Educational Services Office (ESO)**. Built with **non-OOP PHP**, **Tailwind CSS**, **JavaScript**, and **MySQL**.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jan-Russel-Penafiel/ESO_PROJECT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Jan-Russel-Penafiel/ESO_PROJECT/issues"
+  },
+  "homepage": "https://github.com/Jan-Russel-Penafiel/ESO_PROJECT#readme",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.4",
+    "bootstrap-icons": "^1.13.1",
+    "tailwindcss": "^4.2.4"
+  }
+}

@@ -96,7 +96,8 @@ include __DIR__ . '/../templates/sidebar.php';
         </select>
       </form>
     </div>
-    <div class="overflow-x-auto">
+    <!-- Desktop table -->
+    <div class="overflow-x-auto desktop-table">
       <table class="w-full text-sm min-w-[680px]">
         <thead class="bg-emerald-50 text-emerald-800">
           <tr>
@@ -126,8 +127,6 @@ include __DIR__ . '/../templates/sidebar.php';
               ][$f['status']];
               echo '<span class="text-xs px-2 py-1 rounded ' . $cls . '">' . e(ucfirst($f['status'])) . '</span>';
             ?></td>
-
-            <!-- GCash Reference Number column -->
             <td class="p-2">
               <?php if ($f['gcash_ref']): ?>
                 <span class="font-mono text-xs text-slate-700 bg-slate-100 px-1 py-0.5 rounded"><?= e($f['gcash_ref']) ?></span>
@@ -137,7 +136,6 @@ include __DIR__ . '/../templates/sidebar.php';
                 <span class="text-xs text-slate-400">—</span>
               <?php endif; ?>
             </td>
-
             <td class="p-2 text-xs text-slate-500"><?= e(fdate($f['issued_at'], 'M d, Y')) ?></td>
             <td class="p-2 text-center text-xs">
               <a href="<?= APP_URL ?>/actions/fine_delete.php?id=<?= $f['id'] ?>&_csrf=<?= csrf_token() ?>"
@@ -151,6 +149,52 @@ include __DIR__ . '/../templates/sidebar.php';
         <?php endif; ?>
         </tbody>
       </table>
+    </div>
+    <!-- Mobile cards -->
+    <div class="mobile-cards">
+      <?php if (!$fines): ?>
+        <p class="text-center text-slate-400 py-4">No fines found.</p>
+      <?php endif; ?>
+      <?php foreach ($fines as $f):
+        $cls = ['unpaid'=>'bg-red-100 text-red-700','pending'=>'bg-amber-100 text-amber-700','paid'=>'bg-emerald-100 text-emerald-700','cancelled'=>'bg-slate-100 text-slate-600'][$f['status']];
+      ?>
+        <div class="record-card">
+          <div class="card-row" style="margin-bottom:.45rem;">
+            <div>
+              <div class="font-semibold text-slate-800"><?= e($f['full_name']) ?></div>
+              <div class="text-xs text-slate-400"><?= e($f['student_no']) ?> · F-<?= e($f['id']) ?></div>
+            </div>
+            <span class="text-xs px-2 py-1 rounded <?= $cls ?>"><?= e(ucfirst($f['status'])) ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Reason</span>
+            <span class="card-val"><?= e($f['reason']) ?><?= $f['category_name'] ? ' <span style="color:#94a3b8">· ' . e($f['category_name']) . '</span>' : '' ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Amount</span>
+            <span class="card-val font-mono font-semibold text-slate-800"><?= peso($f['amount']) ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">GCash Ref</span>
+            <span class="card-val">
+              <?php if ($f['gcash_ref']): ?>
+                <span class="font-mono bg-slate-100 px-1 rounded"><?= e($f['gcash_ref']) ?></span>
+              <?php elseif ($f['pay_status'] === 'initiated'): ?>
+                <span class="text-amber-500 italic">Awaiting…</span>
+              <?php else: ?>—<?php endif; ?>
+            </span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Issued</span>
+            <span class="card-val text-slate-500"><?= e(fdate($f['issued_at'], 'M d, Y')) ?></span>
+          </div>
+          <div class="card-actions">
+            <a href="<?= APP_URL ?>/actions/fine_delete.php?id=<?= $f['id'] ?>&_csrf=<?= csrf_token() ?>"
+               onclick="return confirm('Delete this fine permanently?')"
+               class="text-red-600 text-xs border border-red-200 px-2 py-1 rounded"><i class="bi bi-trash"></i> Delete</a>
+          </div>
+        </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </div>

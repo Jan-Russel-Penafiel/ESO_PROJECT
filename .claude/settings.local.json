@@ -8,7 +8,18 @@
       "Bash(php -l /c/xampp/htdocs/fine/student/pay.php)",
       "Bash(php -l /c/xampp/htdocs/fine/admin/fines.php)",
       "Bash(php -l /c/xampp/htdocs/fine/actions/submit_payment_ref.php)",
-      "Bash(php -l /c/xampp/htdocs/fine/templates/sidebar.php)"
+      "Bash(php -l /c/xampp/htdocs/fine/templates/sidebar.php)",
+      "Bash(xargs grep *)",
+      "Bash(npm --version)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(npx tailwindcss *)",
+      "Bash(grep -v \"^class$\")",
+      "Bash(grep -v '^$')",
+      "Bash(grep -rn \"bg-\\\\$\" --include=\"*.php\")",
+      "Bash(node_modules/.bin/tailwindcss -i assets/css/input.css -o assets/css/tailwind.css --minify)",
+      "Bash(node_modules/.bin/tailwindcss -i assets/css/input.css -o assets/css/tailwind.css --minify --verbose)",
+      "Bash(node_modules/.bin/tailwindcss --help)"
     ]
   }
 }

@@ -87,7 +87,8 @@ include __DIR__ . '/../templates/sidebar.php';
       <h2 class="font-semibold text-emerald-700"><i class="bi bi-cash-coin"></i> Recent Fines</h2>
       <a href="<?= APP_URL ?>/admin/fines.php" class="text-xs text-emerald-600 hover:underline">View all</a>
     </div>
-    <div class="overflow-x-auto">
+    <!-- Desktop table -->
+    <div class="overflow-x-auto desktop-table">
     <table class="w-full text-sm min-w-[380px]">
       <thead class="bg-emerald-50 text-emerald-800">
         <tr><th class="text-left p-2">Student</th><th class="text-left p-2">Reason</th><th class="text-right p-2">Amount</th><th class="p-2">Status</th></tr>
@@ -109,6 +110,33 @@ include __DIR__ . '/../templates/sidebar.php';
       </tbody>
     </table>
     </div>
+    <!-- Mobile cards -->
+    <div class="mobile-cards">
+      <?php if (!$recentFines): ?>
+        <p class="text-center text-slate-400 py-4">No fines yet.</p>
+      <?php endif; ?>
+      <?php foreach ($recentFines as $f):
+        $cls = ['unpaid'=>'bg-red-100 text-red-700','pending'=>'bg-amber-100 text-amber-700','paid'=>'bg-emerald-100 text-emerald-700','cancelled'=>'bg-slate-100 text-slate-600'][$f['status']];
+      ?>
+        <div class="record-card">
+          <div class="card-row" style="margin-bottom:.45rem;">
+            <div>
+              <div class="font-semibold text-slate-800"><?= e($f['full_name']) ?></div>
+              <div class="text-xs text-slate-400"><?= e($f['student_no']) ?></div>
+            </div>
+            <span class="text-xs px-2 py-1 rounded <?= $cls ?>"><?= e(ucfirst($f['status'])) ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Reason</span>
+            <span class="card-val"><?= e($f['reason']) ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Amount</span>
+            <span class="card-val font-mono font-semibold"><?= peso($f['amount']) ?></span>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
   </div>
 
   <div class="bg-white rounded-lg shadow">
@@ -116,7 +144,8 @@ include __DIR__ . '/../templates/sidebar.php';
       <h2 class="font-semibold text-emerald-700"><i class="bi bi-credit-card-2-back"></i> Recent Payments</h2>
       <a href="<?= APP_URL ?>/admin/payments.php" class="text-xs text-emerald-600 hover:underline">View all</a>
     </div>
-    <div class="overflow-x-auto">
+    <!-- Desktop table -->
+    <div class="overflow-x-auto desktop-table">
     <table class="w-full text-sm min-w-[380px]">
       <thead class="bg-emerald-50 text-emerald-800">
         <tr><th class="text-left p-2">Reference</th><th class="text-left p-2">Student</th><th class="text-right p-2">Amount</th><th class="p-2">Status</th></tr>
@@ -137,6 +166,29 @@ include __DIR__ . '/../templates/sidebar.php';
         <?php endif; ?>
       </tbody>
     </table>
+    </div>
+    <!-- Mobile cards -->
+    <div class="mobile-cards">
+      <?php if (!$recentPayments): ?>
+        <p class="text-center text-slate-400 py-4">No payments yet.</p>
+      <?php endif; ?>
+      <?php foreach ($recentPayments as $p):
+        $cls = ['initiated'=>'bg-slate-100 text-slate-700','pending'=>'bg-amber-100 text-amber-700','success'=>'bg-emerald-100 text-emerald-700','failed'=>'bg-red-100 text-red-700'][$p['status']];
+      ?>
+        <div class="record-card">
+          <div class="card-row" style="margin-bottom:.45rem;">
+            <div>
+              <div class="font-semibold text-slate-800"><?= e($p['full_name']) ?></div>
+              <div class="font-mono text-xs text-slate-400"><?= e($p['reference_no']) ?></div>
+            </div>
+            <span class="text-xs px-2 py-1 rounded <?= $cls ?>"><?= e(ucfirst($p['status'])) ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Amount</span>
+            <span class="card-val font-mono font-semibold"><?= peso($p['amount']) ?></span>
+          </div>
+        </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </div>

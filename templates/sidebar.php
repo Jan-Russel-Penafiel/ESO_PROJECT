@@ -7,7 +7,7 @@ $role = $user['role'];
   class="sidebar-hidden md:translate-x-0 fixed top-0 md:top-[61px]
     left-0 z-20 w-64 shrink-0
               bg-emerald-700 text-white pt-[4.5rem] md:pt-4 transition-transform duration-200
-              h-screen md:h-[calc(100vh-61px)] overflow-y-auto">
+              h-screen md:h-[calc(100vh-61px)] overflow-y-auto"
   <!-- Close button visible only on mobile -->
   <button id="sidebarClose"
     class="md:hidden absolute top-3 right-3 text-white/80 hover:text-white text-2xl leading-none"

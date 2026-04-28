@@ -103,7 +103,8 @@ include __DIR__ . '/../templates/sidebar.php';
         <button class="bg-emerald-600 text-white px-3 py-1 rounded text-sm"><i class="bi bi-search"></i></button>
       </form>
     </div>
-    <div class="overflow-x-auto">
+    <!-- Desktop table -->
+    <div class="overflow-x-auto desktop-table">
       <table class="w-full text-sm min-w-[480px]">
         <thead class="bg-emerald-50 text-emerald-800">
           <tr>
@@ -133,6 +134,34 @@ include __DIR__ . '/../templates/sidebar.php';
         <?php endif; ?>
         </tbody>
       </table>
+    </div>
+    <!-- Mobile cards -->
+    <div class="mobile-cards">
+      <?php if (!$rows): ?>
+        <p class="text-center text-slate-400 py-4">No students found.</p>
+      <?php endif; ?>
+      <?php foreach ($rows as $r): ?>
+        <div class="record-card">
+          <div class="card-row">
+            <span class="font-semibold text-slate-800"><?= e($r['full_name']) ?></span>
+            <span class="font-mono text-xs text-slate-500"><?= e($r['student_no']) ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Course/Year</span>
+            <span class="card-val text-slate-600"><?= e(trim($r['course'] . ' ' . $r['year_level'] . '-' . $r['section'], ' -')) ?></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Email</span>
+            <span class="card-val text-slate-600"><?= e($r['email']) ?></span>
+          </div>
+          <div class="card-actions">
+            <a href="?edit=<?= $r['id'] ?>" class="text-amber-600 text-xs border border-amber-200 px-2 py-1 rounded"><i class="bi bi-pencil"></i> Edit</a>
+            <a href="<?= APP_URL ?>/actions/student_delete.php?id=<?= $r['id'] ?>&_csrf=<?= csrf_token() ?>"
+               onclick="return confirm('Delete this student? Their fines will also be removed.')"
+               class="text-red-600 text-xs border border-red-200 px-2 py-1 rounded"><i class="bi bi-trash"></i> Delete</a>
+          </div>
+        </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </div>
