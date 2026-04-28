@@ -59,11 +59,21 @@ include __DIR__ . '/../templates/sidebar.php';
       <div class="grid grid-cols-3 gap-2">
         <div>
           <label class="block text-slate-600 mb-1">Course</label>
-          <input name="course" value="<?= e($edit['course'] ?? '') ?>" class="w-full border border-slate-300 rounded p-2">
+          <select name="course" class="w-full border border-slate-300 rounded p-2">
+            <option value="">—</option>
+            <?php foreach (['BSCPE','BSCE','BSECE'] as $c): ?>
+              <option value="<?= $c ?>" <?= ($edit['course'] ?? '') === $c ? 'selected' : '' ?>><?= $c ?></option>
+            <?php endforeach; ?>
+          </select>
         </div>
         <div>
           <label class="block text-slate-600 mb-1">Year</label>
-          <input name="year_level" value="<?= e($edit['year_level'] ?? '') ?>" class="w-full border border-slate-300 rounded p-2">
+          <select name="year_level" class="w-full border border-slate-300 rounded p-2">
+            <option value="">—</option>
+            <?php foreach ([1,2,3,4] as $y): ?>
+              <option value="<?= $y ?>" <?= (string)($edit['year_level'] ?? '') === (string)$y ? 'selected' : '' ?>><?= $y ?></option>
+            <?php endforeach; ?>
+          </select>
         </div>
         <div>
           <label class="block text-slate-600 mb-1">Section</label>

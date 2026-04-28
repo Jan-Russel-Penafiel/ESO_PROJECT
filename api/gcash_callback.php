@@ -31,19 +31,18 @@ if (!$pay) { http_response_code(404); die('Invalid payment reference.'); }
 
 // Handle confirmation submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'confirm') {
-    $gcashRef = 'GC-' . strtoupper(bin2hex(random_bytes(5)));
-    if (AUTO_CONFIRM) {
-        db_exec("UPDATE payments SET status='success', gcash_ref=?, paid_at=NOW() WHERE id=?", [$gcashRef, $pay['id']]);
-        db_exec("UPDATE fines SET status='paid', paid_at=NOW() WHERE id=?", [$pay['fine_id']]);
-        db_exec('INSERT INTO activity_logs (user_id, action, description) VALUES (NULL, ?, ?)',
-                ['gcash_auto_success', "Auto-confirmed payment {$pay['reference_no']} (GCash {$gcashRef})"]);
-        $done = 'success';
-    } else {
-        db_exec("UPDATE payments SET status='pending', gcash_ref=? WHERE id=?", [$gcashRef, $pay['id']]);
-        db_exec('INSERT INTO activity_logs (user_id, action, description) VALUES (NULL, ?, ?)',
-                ['gcash_pending', "Marked payment {$pay['reference_no']} pending (GCash {$gcashRef})"]);
-        $done = 'pending';
-    }
+  if (AUTO_CONFIRM) {
+    db_exec("UPDATE payments SET status='success', paid_at=NOW() WHERE id=?", [$pay['id']]);
+    db_exec("UPDATE fines SET status='paid', paid_at=NOW() WHERE id=?", [$pay['fine_id']]);
+    db_exec('INSERT INTO activity_logs (user_id, action, description) VALUES (NULL, ?, ?)',
+        ['gcash_auto_success', "Auto-confirmed payment {$pay['reference_no']}"]);
+    $done = 'success';
+  } else {
+    db_exec("UPDATE payments SET status='pending' WHERE id=?", [$pay['id']]);
+    db_exec('INSERT INTO activity_logs (user_id, action, description) VALUES (NULL, ?, ?)',
+        ['gcash_pending', "Marked payment {$pay['reference_no']} pending"]);
+    $done = 'pending';
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -52,13 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'confi
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GCash Payment · <?= e($pay['reference_no']) ?></title>
-<!-- Tailwind CSS: CDN, local fallback if offline -->
-<link id="tw-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css">
-<script>document.getElementById('tw-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='<?= APP_URL ?>/assets/css/tailwind.min.css';this.replaceWith(l);};</script>
+<!-- Tailwind CSS: local, CDN fallback if missing -->
+<link id="tw-css" rel="stylesheet" href="<?= APP_URL ?>/assets/css/tailwind.min.css">
+<script>document.getElementById('tw-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css';this.replaceWith(l);};</script>
 
-<!-- Bootstrap Icons: CDN, local fallback if offline -->
-<link id="bi-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<script>document.getElementById('bi-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='<?= APP_URL ?>/assets/css/bootstrap-icons.min.css';this.replaceWith(l);};</script>
+<!-- Bootstrap Icons: local, CDN fallback if missing -->
+<link id="bi-css" rel="stylesheet" href="<?= APP_URL ?>/assets/css/bootstrap-icons.min.css">
+<script>document.getElementById('bi-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';this.replaceWith(l);};</script>
 <style>*, *::before, *::after { border-color: #e2e8f0; }</style>
 </head>
 <body class="bg-gradient-to-br from-sky-600 to-sky-800 min-h-screen flex items-center justify-center p-4">

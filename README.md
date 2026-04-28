@@ -178,7 +178,7 @@ curl "http://localhost/fine/api/payment_status.php?ref=ESO-XXXXXXXX-YYYYYY"
 ```
 Expected JSON:
 ```json
-{"ok":true,"status":"initiated","gcash_ref":null,"amount":50,"paid_at":null}
+{"ok":true,"status":"initiated","amount":50,"paid_at":null}
 ```
 
 ### Test GCash callback (simulating a successful confirmation)

@@ -10,18 +10,25 @@ $students   = db_all('SELECT id, student_no, full_name FROM students ORDER BY fu
 $categories = db_all('SELECT * FROM fine_categories WHERE is_active = 1 ORDER BY name');
 
 // Filter
-$status = getq('status');
-$where  = '';
-$params = [];
+$status  = getq('status');
+$course  = getq('course');
+$wheres  = [];
+$params  = [];
 if (in_array($status, ['unpaid','pending','paid','cancelled'], true)) {
-    $where = 'WHERE f.status = ?';
-    $params[] = $status;
+    $wheres[]  = 'f.status = ?';
+    $params[]  = $status;
 }
+if (in_array($course, ['BSCPE','BSCE','BSECE'], true)) {
+    $wheres[]  = 's.course = ?';
+    $params[]  = $course;
+}
+$where = $wheres ? 'WHERE ' . implode(' AND ', $wheres) : '';
 
-// Bring in the latest payment's gcash_ref + payment id for each fine
+// Bring in the latest payment details for each fine
 $fines = db_all("
-    SELECT f.*, s.student_no, s.full_name, c.name AS category_name, u.username AS issuer,
-           p.id AS payment_id, p.gcash_ref, p.reference_no AS pay_ref, p.status AS pay_status
+    SELECT f.*, s.student_no, s.full_name, s.course AS student_course,
+           c.name AS category_name, u.username AS issuer,
+           p.id AS payment_id, p.receipt_path, p.reference_no AS pay_ref, p.status AS pay_status
     FROM fines f
     JOIN students s   ON s.id = f.student_id
     LEFT JOIN fine_categories c ON c.id = f.category_id
@@ -45,14 +52,21 @@ include __DIR__ . '/../templates/sidebar.php';
     <h2 class="font-semibold text-emerald-700 mb-3"><i class="bi bi-plus-circle"></i> Issue New Fine</h2>
     <form action="<?= APP_URL ?>/actions/fine_save.php" method="POST" class="space-y-3 text-sm">
       <?= csrf_field() ?>
-      <div>
+      <div class="relative" id="studentPickerWrap">
         <label class="block text-slate-600 mb-1">Student*</label>
-        <select name="student_id" required class="w-full border rounded p-2">
-          <option value="">— Select student —</option>
+        <input type="hidden" name="student_id" id="studentId" required>
+        <input type="text" id="studentSearch" autocomplete="off" placeholder="Type name or student no…"
+               class="w-full border rounded p-2 text-sm focus:ring focus:ring-emerald-200 outline-none">
+        <ul id="studentDropdown"
+            class="absolute z-50 bg-white border border-slate-200 rounded shadow-lg w-full max-h-52 overflow-y-auto hidden text-sm">
           <?php foreach ($students as $s): ?>
-            <option value="<?= $s['id'] ?>"><?= e($s['student_no'] . ' · ' . $s['full_name']) ?></option>
+            <li class="px-3 py-2 hover:bg-emerald-50 cursor-pointer"
+                data-id="<?= $s['id'] ?>"
+                data-label="<?= e($s['student_no'] . ' · ' . $s['full_name']) ?>">
+              <?= e($s['student_no'] . ' · ' . $s['full_name']) ?>
+            </li>
           <?php endforeach; ?>
-        </select>
+        </ul>
       </div>
 
       <div>
@@ -85,16 +99,33 @@ include __DIR__ . '/../templates/sidebar.php';
 
   <!-- Fines List -->
   <div class="bg-white rounded-lg shadow lg:col-span-2">
-    <div class="p-4 border-b flex items-center justify-between flex-wrap gap-2">
-      <h2 class="font-semibold text-emerald-700">Issued Fines (<?= count($fines) ?>)</h2>
-      <form method="GET" class="text-sm">
-        <select name="status" onchange="this.form.submit()" class="border rounded px-2 py-1">
-          <option value="">All Status</option>
-          <?php foreach (['unpaid','pending','paid','cancelled'] as $st): ?>
-            <option value="<?= $st ?>" <?= $status===$st?'selected':'' ?>><?= ucfirst($st) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </form>
+    <div class="p-4 border-b">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+        <h2 class="font-semibold text-emerald-700">Issued Fines (<?= count($fines) ?>)</h2>
+        <form method="GET" class="text-sm flex items-center gap-2">
+          <?php if ($course): ?><input type="hidden" name="course" value="<?= e($course) ?>"><?php endif; ?>
+          <select name="status" onchange="this.form.submit()" class="border rounded px-2 py-1">
+            <option value="">All Status</option>
+            <?php foreach (['unpaid','pending','paid','cancelled'] as $st): ?>
+              <option value="<?= $st ?>" <?= $status===$st?'selected':'' ?>><?= ucfirst($st) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </form>
+      </div>
+      <!-- Course tabs -->
+      <div class="flex items-center gap-2 text-xs font-medium overflow-x-auto flex-nowrap">
+        <?php
+        $courseFilters = ['' => 'All Courses', 'BSCPE' => 'BSCPE', 'BSCE' => 'BSCE', 'BSECE' => 'BSECE'];
+        foreach ($courseFilters as $val => $label):
+          $active = $course === $val;
+          $href   = '?' . http_build_query(array_filter(['status' => $status, 'course' => $val]));
+        ?>
+           <a href="<?= $href ?>"
+             class="px-3 py-1 rounded-full border whitespace-nowrap <?= $active ? 'bg-emerald-600 text-white border-emerald-600' : 'text-slate-600 border-slate-300 hover:bg-emerald-50' ?>">
+            <?= $label ?>
+          </a>
+        <?php endforeach; ?>
+      </div>
     </div>
     <!-- Desktop table -->
     <div class="overflow-x-auto desktop-table">
@@ -106,7 +137,7 @@ include __DIR__ . '/../templates/sidebar.php';
             <th class="text-left p-2">Reason</th>
             <th class="text-right p-2">Amount</th>
             <th class="p-2">Status</th>
-            <th class="text-left p-2">GCash Ref</th>
+            <th class="p-2">Receipt</th>
             <th class="p-2">Issued</th>
             <th class="p-2">Actions</th>
           </tr>
@@ -127,11 +158,14 @@ include __DIR__ . '/../templates/sidebar.php';
               ][$f['status']];
               echo '<span class="text-xs px-2 py-1 rounded ' . $cls . '">' . e(ucfirst($f['status'])) . '</span>';
             ?></td>
-            <td class="p-2">
-              <?php if ($f['gcash_ref']): ?>
-                <span class="font-mono text-xs text-slate-700 bg-slate-100 px-1 py-0.5 rounded"><?= e($f['gcash_ref']) ?></span>
+            <td class="p-2 text-center">
+              <?php if ($f['receipt_path']): ?>
+                <button type="button" onclick="showReceipt('<?= APP_URL ?>/<?= e($f['receipt_path']) ?>')"
+                        class="text-xs bg-sky-100 text-sky-700 hover:bg-sky-200 px-2 py-1 rounded border border-sky-200">
+                  <i class="bi bi-image"></i> View
+                </button>
               <?php elseif ($f['pay_status'] === 'initiated'): ?>
-                <span class="text-xs text-amber-500 italic">Awaiting ref…</span>
+                <span class="text-xs text-amber-500 italic">Awaiting…</span>
               <?php else: ?>
                 <span class="text-xs text-slate-400">—</span>
               <?php endif; ?>
@@ -175,10 +209,13 @@ include __DIR__ . '/../templates/sidebar.php';
             <span class="card-val font-mono font-semibold text-slate-800"><?= peso($f['amount']) ?></span>
           </div>
           <div class="card-row">
-            <span class="card-label">GCash Ref</span>
+            <span class="card-label">Receipt</span>
             <span class="card-val">
-              <?php if ($f['gcash_ref']): ?>
-                <span class="font-mono bg-slate-100 px-1 rounded"><?= e($f['gcash_ref']) ?></span>
+              <?php if ($f['receipt_path']): ?>
+                <button type="button" onclick="showReceipt('<?= APP_URL ?>/<?= e($f['receipt_path']) ?>')"
+                        class="text-xs bg-sky-100 text-sky-700 px-2 py-1 rounded border border-sky-200">
+                  <i class="bi bi-image"></i> View
+                </button>
               <?php elseif ($f['pay_status'] === 'initiated'): ?>
                 <span class="text-amber-500 italic">Awaiting…</span>
               <?php else: ?>—<?php endif; ?>
@@ -200,6 +237,39 @@ include __DIR__ . '/../templates/sidebar.php';
 </div>
 
 <script>
+  // Searchable student picker
+  (function () {
+    const search = document.getElementById('studentSearch');
+    const hidden = document.getElementById('studentId');
+    const drop   = document.getElementById('studentDropdown');
+    const items  = Array.from(drop.querySelectorAll('li'));
+
+    function showDrop() { drop.classList.remove('hidden'); }
+    function hideDrop() { setTimeout(() => drop.classList.add('hidden'), 150); }
+
+    search.addEventListener('focus', showDrop);
+    search.addEventListener('blur',  hideDrop);
+    search.addEventListener('input', () => {
+      const q = search.value.toLowerCase();
+      hidden.value = '';
+      let any = false;
+      items.forEach(li => {
+        const match = li.dataset.label.toLowerCase().includes(q);
+        li.style.display = match ? '' : 'none';
+        if (match) any = true;
+      });
+      if (any) showDrop(); else hideDrop();
+    });
+
+    items.forEach(li => {
+      li.addEventListener('mousedown', () => {
+        hidden.value  = li.dataset.id;
+        search.value  = li.dataset.label;
+        drop.classList.add('hidden');
+      });
+    });
+  })();
+
   // Auto-fill reason + amount when a category is chosen
   const cat    = document.getElementById('catSelect');
   const amt    = document.getElementById('amountInput');
@@ -211,6 +281,36 @@ include __DIR__ . '/../templates/sidebar.php';
       if (!reason.value) reason.value = opt.dataset.name;
     }
   });
+</script>
+
+<!-- Receipt image modal -->
+<div id="receiptModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 p-4" onclick="if(event.target===this)closeReceipt()">
+  <div class="w-full max-w-md">
+    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="flex items-center justify-between px-4 py-3 bg-emerald-50 border-b border-emerald-100">
+        <h3 class="font-semibold text-emerald-700"><i class="bi bi-image"></i> Receipt Preview</h3>
+        <button onclick="closeReceipt()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+      </div>
+      <div class="p-3 bg-slate-50">
+        <div class="bg-white rounded-lg border border-slate-200 p-2">
+          <img id="receiptModalImg" src="" alt="Receipt preview" class="w-full rounded-md max-h-[55vh] object-contain">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function showReceipt(url) {
+    document.getElementById('receiptModalImg').src = url;
+    document.getElementById('receiptModal').classList.remove('hidden');
+    document.getElementById('receiptModal').classList.add('flex');
+  }
+  function closeReceipt() {
+    document.getElementById('receiptModal').classList.add('hidden');
+    document.getElementById('receiptModal').classList.remove('flex');
+    document.getElementById('receiptModalImg').src = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReceipt(); });
 </script>
 
 <?php include __DIR__ . '/../templates/footer.php'; ?>

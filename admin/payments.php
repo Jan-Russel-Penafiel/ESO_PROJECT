@@ -71,7 +71,7 @@ include __DIR__ . '/../templates/sidebar.php';
           <th class="text-right p-2">Amount</th>
           <th class="p-2">Method</th>
           <th class="p-2">Status</th>
-          <th class="p-2">GCash Ref</th>
+          <th class="p-2">Receipt</th>
           <th class="p-2">Created</th>
           <th class="p-2">Action</th>
         </tr>
@@ -88,7 +88,18 @@ include __DIR__ . '/../templates/sidebar.php';
             $cls = ['initiated'=>'bg-slate-100 text-slate-700','pending'=>'bg-amber-100 text-amber-700','success'=>'bg-emerald-100 text-emerald-700','failed'=>'bg-red-100 text-red-700'][$p['status']];
             echo '<span class="text-xs px-2 py-1 rounded ' . $cls . '">' . e(ucfirst($p['status'])) . '</span>';
           ?></td>
-          <td class="p-2 font-mono text-xs"><?= e($p['gcash_ref'] ?: '—') ?></td>
+          <td class="p-2 text-center">
+            <?php if ($p['receipt_path']): ?>
+              <button type="button" onclick="showReceipt('<?= APP_URL ?>/<?= e($p['receipt_path']) ?>')"
+                      class="text-xs bg-sky-100 text-sky-700 hover:bg-sky-200 px-2 py-1 rounded border border-sky-200">
+                <i class="bi bi-image"></i> View
+              </button>
+            <?php elseif ($p['status'] === 'initiated'): ?>
+              <span class="text-xs text-amber-500 italic">Awaiting…</span>
+            <?php else: ?>
+              <span class="text-xs text-slate-400">—</span>
+            <?php endif; ?>
+          </td>
           <td class="p-2 text-xs text-slate-500"><?= e(fdate($p['created_at'], 'M d, h:i A')) ?></td>
           <td class="p-2 text-center text-xs">
             <?php if (in_array($p['status'], ['initiated','pending'], true)): ?>
@@ -98,6 +109,12 @@ include __DIR__ . '/../templates/sidebar.php';
               <a href="<?= APP_URL ?>/actions/payment_fail.php?id=<?= $p['id'] ?>&_csrf=<?= csrf_token() ?>"
                  onclick="return confirm('Mark this payment FAILED?')"
                  class="text-red-600 ml-2"><i class="bi bi-x-circle"></i> Fail</a>
+            <?php elseif ($p['status'] === 'success'): ?>
+              <a href="<?= APP_URL ?>/student/print_receipt.php?id=<?= $p['id'] ?>&download=1"
+                 target="_blank"
+                 class="inline-flex items-center gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded">
+                <i class="bi bi-printer"></i> Print
+              </a>
             <?php else: ?>
               <span class="text-slate-400">—</span>
             <?php endif; ?>
@@ -142,8 +159,17 @@ include __DIR__ . '/../templates/sidebar.php';
           <span class="card-val"><?= e($p['payment_method']) ?></span>
         </div>
         <div class="card-row">
-          <span class="card-label">GCash Ref</span>
-          <span class="card-val font-mono"><?= e($p['gcash_ref'] ?: '—') ?></span>
+          <span class="card-label">Receipt</span>
+          <span class="card-val">
+            <?php if ($p['receipt_path']): ?>
+              <button type="button" onclick="showReceipt('<?= APP_URL ?>/<?= e($p['receipt_path']) ?>')"
+                      class="text-xs bg-sky-100 text-sky-700 px-2 py-1 rounded border border-sky-200">
+                <i class="bi bi-image"></i> View
+              </button>
+            <?php elseif ($p['status'] === 'initiated'): ?>
+              <span class="text-amber-500 italic">Awaiting…</span>
+            <?php else: ?>—<?php endif; ?>
+          </span>
         </div>
         <div class="card-row">
           <span class="card-label">Date</span>
@@ -158,10 +184,48 @@ include __DIR__ . '/../templates/sidebar.php';
                onclick="return confirm('Mark this payment FAILED?')"
                class="text-red-600 text-xs border border-red-200 px-2 py-1 rounded"><i class="bi bi-x-circle"></i> Fail</a>
           </div>
+        <?php elseif ($p['status'] === 'success'): ?>
+          <div class="card-actions">
+            <a href="<?= APP_URL ?>/student/print_receipt.php?id=<?= $p['id'] ?>&download=1"
+               target="_blank"
+               class="inline-flex items-center gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded">
+              <i class="bi bi-printer"></i> Print Receipt
+            </a>
+          </div>
         <?php endif; ?>
       </div>
     <?php endforeach; ?>
   </div>
 </div>
+
+<!-- Receipt image modal -->
+<div id="receiptModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 p-4" onclick="if(event.target===this)closeReceipt()">
+  <div class="w-full max-w-3xl">
+    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="flex items-center justify-between px-4 py-3 bg-emerald-50 border-b border-emerald-100">
+        <h3 class="font-semibold text-emerald-700"><i class="bi bi-image"></i> Receipt Preview</h3>
+        <button onclick="closeReceipt()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+      </div>
+      <div class="p-4 bg-slate-50">
+        <div class="bg-white rounded-lg border border-slate-200 p-2">
+          <img id="receiptModalImg" src="" alt="Receipt preview" class="w-full rounded-md max-h-[70vh] object-contain">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function showReceipt(url) {
+    document.getElementById('receiptModalImg').src = url;
+    document.getElementById('receiptModal').classList.remove('hidden');
+    document.getElementById('receiptModal').classList.add('flex');
+  }
+  function closeReceipt() {
+    document.getElementById('receiptModal').classList.add('hidden');
+    document.getElementById('receiptModal').classList.remove('flex');
+    document.getElementById('receiptModalImg').src = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReceipt(); });
+</script>
 
 <?php include __DIR__ . '/../templates/footer.php'; ?>

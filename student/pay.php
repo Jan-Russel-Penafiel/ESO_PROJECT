@@ -6,9 +6,9 @@
 //  1. Read fine, validate ownership and unpaid status.
 //  2. Create or reuse an 'initiated' payment row.
 //  3. Show the static gcash.jpg InstaPay QR + amount.
-//  4. Student pays via GCash, enters the GCash
-//     reference number, and submits.
-//  5. Reference saved → payment becomes 'pending'.
+//  4. Student pays via GCash and uploads
+//     the receipt screenshot.
+//  5. Receipt saved → payment becomes 'pending'.
 //  6. Admin verifies and approves or disapproves.
 // =====================================================
 require_once __DIR__ . '/../includes/auth.php';
@@ -30,8 +30,8 @@ if ($fine['status'] === 'cancelled') { flash('warning', 'This fine was cancelled
 
 // Reuse existing in-flight payment or create a fresh one
 $payment = db_one("
-  SELECT id, fine_id, student_id, amount, reference_no, gcash_ref, payment_method,
-       status, qr_payload, created_at, paid_at
+  SELECT id, fine_id, student_id, amount, reference_no, payment_method,
+    status, qr_payload, created_at, paid_at
   FROM payments
   WHERE fine_id = ? AND status IN ('initiated','pending')
   ORDER BY id DESC LIMIT 1", [$fineId]);
@@ -42,7 +42,7 @@ if (!$payment) {
         INSERT INTO payments (fine_id, student_id, amount, reference_no, payment_method, status)
         VALUES (?, ?, ?, ?, 'GCASH', 'initiated')",
         [$fineId, $student['id'], $fine['amount'], $ref]);
-    $payment = db_one('SELECT id, fine_id, student_id, amount, reference_no, gcash_ref, payment_method, status, qr_payload, created_at, paid_at FROM payments WHERE id = ?', [$pid]);
+    $payment = db_one('SELECT id, fine_id, student_id, amount, reference_no, payment_method, status, qr_payload, created_at, paid_at FROM payments WHERE id = ?', [$pid]);
     log_activity('payment_initiated', "Payment {$payment['reference_no']} for fine F-{$fineId}");
 }
 
@@ -81,38 +81,45 @@ include __DIR__ . '/../templates/sidebar.php';
         <li>Scan the <strong>InstaPay QR code</strong> on the right</li>
         <li>Enter <strong><?= peso($fine['amount']) ?></strong> as the amount</li>
         <li>Confirm the transfer to <strong><?= e(GCASH_MERCHANT_NAME) ?></strong></li>
-        <li>Copy the <strong>GCash Reference Number</strong> from the receipt</li>
-        <li>Enter it below and click <strong>Submit</strong></li>
+        <li>Save a screenshot of your <strong>GCash receipt</strong></li>
+        <li>Upload it below and click <strong>Submit</strong></li>
       </ol>
     </div>
 
-    <!-- Reference number form / pending state -->
+    <!-- Receipt upload form / pending state -->
     <?php if ($payment['status'] === 'initiated'): ?>
-      <form action="<?= APP_URL ?>/actions/submit_payment_ref.php" method="POST" class="space-y-3">
+      <form action="<?= APP_URL ?>/actions/submit_payment_ref.php" method="POST" enctype="multipart/form-data" class="space-y-3">
         <?= csrf_field() ?>
         <input type="hidden" name="payment_id" value="<?= $payment['id'] ?>">
         <input type="hidden" name="fine_id"    value="<?= $fine['id'] ?>">
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">
-            GCash Reference Number (required)
+            GCash Receipt Screenshot <span class="text-red-500">*</span>
           </label>
-          <input type="text" name="gcash_ref" required maxlength="13" minlength="13"
-                 aria-required="true"
-                 inputmode="numeric" pattern="[0-9]{13}" title="GCash reference number must be exactly 13 digits."
-                 placeholder="e.g. 1234567890123"
-                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm
-                        focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none font-mono">
+          <div id="dropZone"
+               class="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50 transition-colors">
+            <i class="bi bi-cloud-upload text-2xl text-slate-400" id="dropIcon"></i>
+            <p class="text-sm text-slate-500 mt-1" id="dropText">Click or drag &amp; drop your receipt image here</p>
+            <p class="text-xs text-slate-400 mt-0.5">JPG, PNG, or WEBP · max 5 MB</p>
+            <input type="file" name="receipt" id="receiptFile" required accept="image/jpeg,image/png,image/webp"
+                   class="hidden">
+          </div>
+          <!-- Preview -->
+          <div id="previewWrap" class="hidden mt-2">
+            <img id="previewImg" src="" alt="Receipt preview" class="rounded-lg border max-h-48 mx-auto">
+            <p id="previewName" class="text-xs text-center text-slate-500 mt-1"></p>
+          </div>
         </div>
         <button type="submit"
                 class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2">
-          <i class="bi bi-send"></i> Submit Payment Reference
+          <i class="bi bi-send"></i> Submit Receipt
         </button>
       </form>
 
     <?php elseif ($payment['status'] === 'pending'): ?>
       <div class="bg-amber-50 border border-amber-300 rounded-lg p-4 text-sm">
-        <p class="font-semibold text-amber-800"><i class="bi bi-hourglass-split"></i> Reference Submitted — Awaiting Verification</p>
-        <p class="text-amber-700 mt-1">Your GCash reference <strong class="font-mono"><?= e($payment['gcash_ref']) ?></strong> has been submitted. The admin is reviewing your payment.</p>
+        <p class="font-semibold text-amber-800"><i class="bi bi-hourglass-split"></i> Receipt Submitted — Awaiting Verification</p>
+        <p class="text-amber-700 mt-1">Your GCash receipt has been submitted. The admin is reviewing your payment.</p>
         <p class="text-xs text-amber-600 mt-2">This page refreshes automatically every 10 seconds.</p>
       </div>
     <?php endif; ?>
@@ -137,13 +144,37 @@ include __DIR__ . '/../templates/sidebar.php';
 
 <?php if ($payment['status'] === 'initiated'): ?>
 <script>
-  // Keep input numeric-only and capped at 13 digits during typing/paste.
-  const gcashRefInput = document.querySelector('input[name="gcash_ref"]');
-  if (gcashRefInput) {
-    gcashRefInput.addEventListener('input', () => {
-      gcashRefInput.value = gcashRefInput.value.replace(/\D/g, '').slice(0, 13);
+  (function () {
+    const zone    = document.getElementById('dropZone');
+    const input   = document.getElementById('receiptFile');
+    const wrap    = document.getElementById('previewWrap');
+    const img     = document.getElementById('previewImg');
+    const name    = document.getElementById('previewName');
+    const icon    = document.getElementById('dropIcon');
+    const text    = document.getElementById('dropText');
+
+    zone.addEventListener('click', () => input.click());
+
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('border-emerald-400','bg-emerald-50'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('border-emerald-400','bg-emerald-50'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('border-emerald-400','bg-emerald-50');
+      if (e.dataTransfer.files.length) { input.files = e.dataTransfer.files; showPreview(e.dataTransfer.files[0]); }
     });
-  }
+
+    input.addEventListener('change', () => { if (input.files.length) showPreview(input.files[0]); });
+
+    function showPreview(file) {
+      const reader = new FileReader();
+      reader.onload = e => { img.src = e.target.result; };
+      reader.readAsDataURL(file);
+      name.textContent = file.name;
+      wrap.classList.remove('hidden');
+      icon.className = 'bi bi-check-circle text-2xl text-emerald-500';
+      text.textContent = 'Receipt selected — change by clicking above';
+    }
+  })();
 </script>
 <?php endif; ?>
 

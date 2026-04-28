@@ -58,7 +58,7 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `description`, `created_
 (16, 1, 'logout', 'User logged out', '2026-04-27 14:13:20'),
 (17, 2, 'login', 'User logged in: juan', '2026-04-27 14:13:34'),
 (18, 2, 'payment_initiated', 'Payment ESO-12DFA0DA-260427221340 for fine F-2', '2026-04-27 14:13:40'),
-(19, 2, 'payment_ref_submitted', 'Student submitted GCash ref \'1111111111111\' for payment #2', '2026-04-27 14:38:29'),
+(19, 2, 'payment_ref_submitted', 'Student submitted receipt for payment #2', '2026-04-27 14:38:29'),
 (20, 2, 'logout', 'User logged out', '2026-04-27 14:38:41'),
 (21, 1, 'login', 'User logged in: admin', '2026-04-27 14:39:01'),
 (22, 1, 'payment_verify', 'Verified payment #2', '2026-04-27 14:39:17'),
@@ -66,7 +66,7 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `description`, `created_
 (24, 1, 'logout', 'User logged out', '2026-04-27 14:41:58'),
 (25, 2, 'login', 'User logged in: juan', '2026-04-27 14:42:05'),
 (26, 2, 'payment_initiated', 'Payment ESO-EF73D622-260427224209 for fine F-3', '2026-04-27 14:42:09'),
-(27, 2, 'payment_ref_submitted', 'Student submitted GCash ref \'2222222222222\' for payment #3', '2026-04-27 14:42:59'),
+(27, 2, 'payment_ref_submitted', 'Student submitted receipt for payment #3', '2026-04-27 14:42:59'),
 (28, 2, 'logout', 'User logged out', '2026-04-27 14:43:05'),
 (29, 2, 'login', 'User logged in: juan', '2026-04-27 14:43:13'),
 (30, 2, 'logout', 'User logged out', '2026-04-27 14:43:23'),
@@ -102,7 +102,7 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `description`, `created_
 (60, 1, 'login', 'User logged in: admin', '2026-04-28 05:45:23'),
 (61, 1, 'logout', 'User logged out', '2026-04-28 05:50:52'),
 (62, 2, 'login', 'User logged in: juan', '2026-04-28 05:50:58'),
-(63, 2, 'payment_ref_submitted', 'Student submitted GCash ref \'1111111111111\' for payment #4', '2026-04-28 05:51:20'),
+(63, 2, 'payment_ref_submitted', 'Student submitted receipt for payment #4', '2026-04-28 05:51:20'),
 (64, 2, 'logout', 'User logged out', '2026-04-28 05:51:25'),
 (65, 1, 'login', 'User logged in: admin', '2026-04-28 05:51:39'),
 (66, 1, 'payment_verify', 'Verified payment #4', '2026-04-28 05:51:46'),
@@ -192,7 +192,7 @@ CREATE TABLE `payments` (
   `student_id` int(11) UNSIGNED NOT NULL,
   `amount` decimal(10,2) NOT NULL,
   `reference_no` varchar(60) NOT NULL,
-  `gcash_ref` varchar(60) DEFAULT NULL,
+  `receipt_path` varchar(255) DEFAULT NULL,
   `payment_method` varchar(40) NOT NULL DEFAULT 'GCASH',
   `status` enum('initiated','pending','success','failed') NOT NULL DEFAULT 'initiated',
   `qr_payload` text DEFAULT NULL,
@@ -204,11 +204,11 @@ CREATE TABLE `payments` (
 -- Dumping data for table `payments`
 --
 
-INSERT INTO `payments` (`id`, `fine_id`, `student_id`, `amount`, `reference_no`, `gcash_ref`, `payment_method`, `status`, `qr_payload`, `created_at`, `paid_at`) VALUES
-(1, 1, 1, 25.00, 'ESO-383A8007-260427220111', 'MANUAL-0E2C7EFF', 'GCASH', 'success', '{\"merchant\":\"ESO OFFICE\",\"gcash_no\":\"09171234567\",\"amount\":25,\"reference\":\"ESO-383A8007-260427220111\",\"callback\":\"http:\\/\\/localhost\\/fine\\/api\\/gcash_callback.php?ref=ESO-383A8007-260427220111\"}', '2026-04-27 14:01:11', '2026-04-27 14:11:26'),
-(2, 2, 1, 50.00, 'ESO-12DFA0DA-260427221340', '1111111111111', 'GCASH', 'success', NULL, '2026-04-27 14:13:40', '2026-04-27 14:39:17'),
-(3, 3, 1, 50.00, 'ESO-EF73D622-260427224209', '2222222222222', 'GCASH', 'pending', NULL, '2026-04-27 14:42:09', NULL),
-(4, 4, 1, 25.00, 'ESO-09AD7C48-260427224501', '1111111111111', 'GCASH', 'success', NULL, '2026-04-27 14:45:01', '2026-04-28 05:51:46');
+INSERT INTO `payments` (`id`, `fine_id`, `student_id`, `amount`, `reference_no`, `receipt_path`, `payment_method`, `status`, `qr_payload`, `created_at`, `paid_at`) VALUES
+(1, 1, 1, 25.00, 'ESO-383A8007-260427220111', NULL, 'GCASH', 'success', '{\"merchant\":\"ESO OFFICE\",\"gcash_no\":\"09171234567\",\"amount\":25,\"reference\":\"ESO-383A8007-260427220111\",\"callback\":\"http:\\/\\/localhost\\/fine\\/api\\/gcash_callback.php?ref=ESO-383A8007-260427220111\"}', '2026-04-27 14:01:11', '2026-04-27 14:11:26'),
+(2, 2, 1, 50.00, 'ESO-12DFA0DA-260427221340', NULL, 'GCASH', 'success', NULL, '2026-04-27 14:13:40', '2026-04-27 14:39:17'),
+(3, 3, 1, 50.00, 'ESO-EF73D622-260427224209', NULL, 'GCASH', 'pending', NULL, '2026-04-27 14:42:09', NULL),
+(4, 4, 1, 25.00, 'ESO-09AD7C48-260427224501', NULL, 'GCASH', 'success', NULL, '2026-04-27 14:45:01', '2026-04-28 05:51:46');
 
 -- --------------------------------------------------------
 

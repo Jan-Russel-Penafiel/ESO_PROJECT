@@ -31,6 +31,7 @@ include __DIR__ . '/../templates/sidebar.php';
         <th class="text-right p-2">Amount</th>
         <th class="p-2">Status</th>
         <th class="p-2">Issued</th>
+        <th class="p-2">Action</th>
       </tr>
     </thead>
     <tbody>
@@ -45,9 +46,24 @@ include __DIR__ . '/../templates/sidebar.php';
           echo '<span class="text-xs px-2 py-1 rounded ' . $cls . '">' . e(ucfirst($f['status'])) . '</span>';
         ?></td>
         <td class="p-2 text-xs text-slate-500"><?= e(fdate($f['issued_at'], 'M d, Y')) ?></td>
+        <td class="p-2 text-center">
+          <?php if ($f['status'] === 'unpaid'): ?>
+            <a href="<?= APP_URL ?>/student/pay.php?fine_id=<?= $f['id'] ?>"
+               class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded inline-block">
+              <i class="bi bi-credit-card"></i> Pay
+            </a>
+          <?php elseif ($f['status'] === 'pending'): ?>
+            <a href="<?= APP_URL ?>/student/pay.php?fine_id=<?= $f['id'] ?>"
+               class="text-xs bg-amber-400 hover:bg-amber-500 text-amber-900 font-semibold px-2 py-1 rounded inline-block border border-amber-500">
+              <i class="bi bi-hourglass-split"></i> View
+            </a>
+          <?php else: ?>
+            <span class="text-xs text-slate-400">—</span>
+          <?php endif; ?>
+        </td>
       </tr>
     <?php endforeach; if (!$rows): ?>
-      <tr><td colspan="6" class="p-4 text-center text-slate-400">No fines on record.</td></tr>
+      <tr><td colspan="7" class="p-4 text-center text-slate-400">No fines on record.</td></tr>
     <?php endif; ?>
     </tbody>
   </table>
@@ -76,6 +92,14 @@ include __DIR__ . '/../templates/sidebar.php';
           <span class="card-label">Issued</span>
           <span class="card-val text-slate-500"><?= e(fdate($f['issued_at'], 'M d, Y')) ?></span>
         </div>
+        <?php if ($f['status'] === 'unpaid' || $f['status'] === 'pending'): ?>
+          <div class="card-actions">
+            <a href="<?= APP_URL ?>/student/pay.php?fine_id=<?= $f['id'] ?>"
+               class="text-xs <?= $f['status'] === 'unpaid' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-amber-400 hover:bg-amber-500 text-amber-900 font-semibold border border-amber-500' ?> px-3 py-1 rounded">
+              <?= $f['status'] === 'unpaid' ? '<i class="bi bi-credit-card"></i> Pay' : '<i class="bi bi-hourglass-split"></i> View' ?>
+            </a>
+          </div>
+        <?php endif; ?>
       </div>
     <?php endforeach; ?>
   </div>

@@ -31,7 +31,6 @@ include __DIR__ . '/../templates/sidebar.php';
         <th class="text-right p-2">Amount</th>
         <th class="p-2">Method</th>
         <th class="p-2">Status</th>
-        <th class="p-2">GCash Ref</th>
         <th class="p-2">Date</th>
         <th class="p-2">Action</th>
       </tr>
@@ -47,11 +46,10 @@ include __DIR__ . '/../templates/sidebar.php';
         <td class="p-2 text-center">
           <span class="text-xs px-2 py-1 rounded <?= $cls ?>"><?= e(ucfirst($p['status'])) ?></span>
         </td>
-        <td class="p-2 font-mono text-xs"><?= e($p['gcash_ref'] ?: '—') ?></td>
         <td class="p-2 text-xs text-slate-500"><?= e(fdate($p['created_at'])) ?></td>
         <td class="p-2 text-center">
           <?php if ($p['status'] === 'success'): ?>
-          <a href="<?= APP_URL ?>/student/print_receipt.php?id=<?= $p['id'] ?>"
+          <a href="<?= APP_URL ?>/student/print_receipt.php?id=<?= $p['id'] ?>&download=1"
              target="_blank"
              class="inline-flex items-center gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded transition"
              title="Print Receipt">
@@ -61,7 +59,7 @@ include __DIR__ . '/../templates/sidebar.php';
         </td>
       </tr>
     <?php endforeach; if (!$rows): ?>
-      <tr><td colspan="8" class="p-4 text-center text-slate-400">No payments yet.</td></tr>
+      <tr><td colspan="7" class="p-4 text-center text-slate-400">No payments yet.</td></tr>
     <?php endif; ?>
     </tbody>
   </table>
@@ -91,16 +89,12 @@ include __DIR__ . '/../templates/sidebar.php';
           <span class="card-val"><?= e($p['payment_method']) ?></span>
         </div>
         <div class="card-row">
-          <span class="card-label">GCash Ref</span>
-          <span class="card-val font-mono"><?= e($p['gcash_ref'] ?: '—') ?></span>
-        </div>
-        <div class="card-row">
           <span class="card-label">Date</span>
           <span class="card-val text-slate-500"><?= e(fdate($p['created_at'])) ?></span>
         </div>
         <?php if ($p['status'] === 'success'): ?>
         <div class="card-actions">
-          <a href="<?= APP_URL ?>/student/print_receipt.php?id=<?= $p['id'] ?>"
+           <a href="<?= APP_URL ?>/student/print_receipt.php?id=<?= $p['id'] ?>&download=1"
              target="_blank"
              class="inline-flex items-center gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded transition">
             <i class="bi bi-printer"></i> Print Receipt
