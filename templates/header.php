@@ -1,5 +1,5 @@
 <?php
-// Layout header — opens <html>, loads Tailwind, opens shell
+// Layout header — opens <html> and app shell
 require_once __DIR__ . '/../includes/auth.php';
 $pageTitle = $pageTitle ?? 'Dashboard';
 $user = current_user();
@@ -11,13 +11,16 @@ $user = current_user();
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= e($pageTitle) ?> · <?= e(APP_NAME) ?></title>
 
-<!-- Tailwind CSS (local) -->
-<link rel="stylesheet" href="<?= APP_URL ?>/assets/css/tailwind.css">
+<!-- Tailwind CSS: CDN, local fallback if offline -->
+<link id="tw-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css">
+<script>document.getElementById('tw-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='<?= APP_URL ?>/assets/css/tailwind.min.css';this.replaceWith(l);};</script>
 
-<!-- Bootstrap Icons (local) -->
-<link rel="stylesheet" href="<?= APP_URL ?>/assets/css/bootstrap-icons.css">
+<!-- Bootstrap Icons: CDN, local fallback if offline -->
+<link id="bi-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<script>document.getElementById('bi-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='<?= APP_URL ?>/assets/css/bootstrap-icons.min.css';this.replaceWith(l);};</script>
 
 <style>
+  *, *::before, *::after { border-color: #e2e8f0; }
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
   .sidebar-hidden { transform: translateX(-100%); }
   main table th, main table td { text-align: center !important; vertical-align: middle; }

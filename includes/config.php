@@ -13,7 +13,7 @@ define('DB_PASS', '');
 
 // --- App ---
 define('APP_NAME', 'ESO Fines Management System');
-define('APP_URL',  'http://localhost/fine');
+define('APP_URL',  (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/fine');
 define('TIMEZONE', 'Asia/Manila');
 
 // --- GCash (simulated) ---

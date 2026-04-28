@@ -30,7 +30,12 @@
       "Bash(curl -L \"https://github.com/google/fonts/raw/main/ofl/dancingscript/DancingScript-Regular.ttf\" -o \"/c/xampp/htdocs/fine/assets/fonts/DancingScript-Regular.ttf\")",
       "Bash(php -l \"C:/xampp/htdocs/fine/student/print_receipt.php\")",
       "Bash(curl -L -A Mozilla/5.0 https://github.com/google/fonts/raw/refs/heads/main/ofl/dancingscript/DancingScript%5Bwght%5D.ttf -o C:/xampp/htdocs/fine/assets/fonts/DancingScript-Regular.ttf)",
-      "Bash(echo \"Exit: $?\")"
+      "Bash(echo \"Exit: $?\")",
+      "Bash(curl -sL \"https://cdn.tailwindcss.com/3.4.17/tailwind.min.css\" -o \"c:/xampp/htdocs/fine/assets/css/tailwind.min.css\")",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css\" -o \"c:/xampp/htdocs/fine/assets/css/tailwind.min.css\")",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css\" -o \"c:/xampp/htdocs/fine/assets/css/bootstrap-icons.min.css\")",
+      "Bash(node_modules/.bin/tailwindcss -i assets/css/input.css -o assets/css/tailwind.min.css --minify --content \"./**/*.php\")",
+      "Bash(node_modules/.bin/tailwindcss -i assets/css/input.css -o assets/css/tailwind.min.css --minify)"
     ]
   }
 }

@@ -18,8 +18,14 @@ $expired = isset($_GET['expired']);
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login · <?= e(APP_NAME) ?></title>
-<link rel="stylesheet" href="<?= APP_URL ?>/assets/css/tailwind.css">
-<link rel="stylesheet" href="<?= APP_URL ?>/assets/css/bootstrap-icons.css">
+<!-- Tailwind CSS: CDN, local fallback if offline -->
+<link id="tw-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css">
+<script>document.getElementById('tw-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='<?= APP_URL ?>/assets/css/tailwind.min.css';this.replaceWith(l);};</script>
+
+<!-- Bootstrap Icons: CDN, local fallback if offline -->
+<link id="bi-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<script>document.getElementById('bi-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='<?= APP_URL ?>/assets/css/bootstrap-icons.min.css';this.replaceWith(l);};</script>
+<style>*, *::before, *::after { border-color: #e2e8f0; }</style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center p-4">
 
