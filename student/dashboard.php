@@ -73,10 +73,10 @@ include __DIR__ . '/../templates/sidebar.php';
     <tbody>
     <?php foreach ($activeFines as $f): ?>
       <tr class="border-t hover:bg-emerald-50/40">
-        <td class="p-2"><?= e($f['reason']) ?> <span class="text-xs text-slate-400">· <?= e($f['category_name'] ?? 'Custom') ?></span></td>
+        <td class="p-2"><?= e($f['reason']) ?></td>
         <td class="p-2 text-right font-mono"><?= peso($f['amount']) ?></td>
         <td class="p-2 text-center"><?php
-          $cls = ['unpaid'=>'bg-red-100 text-red-700','pending'=>'bg-amber-100 text-amber-700'][$f['status']] ?? 'bg-slate-100 text-slate-700';
+           $cls = ['unpaid'=>'bg-red-100 text-red-700','pending'=>'bg-amber-100 text-amber-700'][$f['status']] ?? 'bg-slate-100 text-slate-700';
           echo '<span class="text-xs px-2 py-1 rounded ' . $cls . '">' . e(ucfirst($f['status'])) . '</span>';
         ?></td>
         <td class="p-2 text-xs text-slate-500"><?= e(fdate($f['issued_at'], 'M d, Y')) ?></td>
@@ -115,7 +115,6 @@ include __DIR__ . '/../templates/sidebar.php';
         <div class="card-row" style="margin-bottom:.45rem;">
           <div>
             <div class="font-semibold text-slate-800"><?= e($f['reason']) ?></div>
-            <div class="text-xs text-slate-400"><?= e($f['category_name'] ?? 'Custom') ?></div>
           </div>
           <span class="text-xs px-2 py-1 rounded <?= $cls ?>"><?= e(ucfirst($f['status'])) ?></span>
         </div>

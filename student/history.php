@@ -33,24 +33,35 @@ include __DIR__ . '/../templates/sidebar.php';
         <th class="p-2">Status</th>
         <th class="p-2">GCash Ref</th>
         <th class="p-2">Date</th>
+        <th class="p-2">Action</th>
       </tr>
     </thead>
     <tbody>
     <?php foreach ($rows as $p): ?>
+      <?php $cls = ['initiated'=>'bg-slate-100 text-slate-700','pending'=>'bg-amber-100 text-amber-700','success'=>'bg-emerald-100 text-emerald-700','failed'=>'bg-red-100 text-red-700'][$p['status']]; ?>
       <tr class="border-t">
         <td class="p-2 font-mono text-xs"><?= e($p['reference_no']) ?></td>
         <td class="p-2"><?= e($p['reason']) ?></td>
         <td class="p-2 text-right font-mono"><?= peso($p['amount']) ?></td>
         <td class="p-2 text-center text-xs"><?= e($p['payment_method']) ?></td>
-        <td class="p-2 text-center"><?php
-          $cls = ['initiated'=>'bg-slate-100 text-slate-700','pending'=>'bg-amber-100 text-amber-700','success'=>'bg-emerald-100 text-emerald-700','failed'=>'bg-red-100 text-red-700'][$p['status']];
-          echo '<span class="text-xs px-2 py-1 rounded ' . $cls . '">' . e(ucfirst($p['status'])) . '</span>';
-        ?></td>
+        <td class="p-2 text-center">
+          <span class="text-xs px-2 py-1 rounded <?= $cls ?>"><?= e(ucfirst($p['status'])) ?></span>
+        </td>
         <td class="p-2 font-mono text-xs"><?= e($p['gcash_ref'] ?: '—') ?></td>
         <td class="p-2 text-xs text-slate-500"><?= e(fdate($p['created_at'])) ?></td>
+        <td class="p-2 text-center">
+          <?php if ($p['status'] === 'success'): ?>
+          <a href="<?= APP_URL ?>/student/print_receipt.php?id=<?= $p['id'] ?>"
+             target="_blank"
+             class="inline-flex items-center gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded transition"
+             title="Print Receipt">
+            <i class="bi bi-printer"></i> Print
+          </a>
+          <?php endif; ?>
+        </td>
       </tr>
     <?php endforeach; if (!$rows): ?>
-      <tr><td colspan="7" class="p-4 text-center text-slate-400">No payments yet.</td></tr>
+      <tr><td colspan="8" class="p-4 text-center text-slate-400">No payments yet.</td></tr>
     <?php endif; ?>
     </tbody>
   </table>
@@ -87,6 +98,15 @@ include __DIR__ . '/../templates/sidebar.php';
           <span class="card-label">Date</span>
           <span class="card-val text-slate-500"><?= e(fdate($p['created_at'])) ?></span>
         </div>
+        <?php if ($p['status'] === 'success'): ?>
+        <div class="card-actions">
+          <a href="<?= APP_URL ?>/student/print_receipt.php?id=<?= $p['id'] ?>"
+             target="_blank"
+             class="inline-flex items-center gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded transition">
+            <i class="bi bi-printer"></i> Print Receipt
+          </a>
+        </div>
+        <?php endif; ?>
       </div>
     <?php endforeach; ?>
   </div>

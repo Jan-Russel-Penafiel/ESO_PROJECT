@@ -19,7 +19,18 @@
       "Bash(grep -rn \"bg-\\\\$\" --include=\"*.php\")",
       "Bash(node_modules/.bin/tailwindcss -i assets/css/input.css -o assets/css/tailwind.css --minify)",
       "Bash(node_modules/.bin/tailwindcss -i assets/css/input.css -o assets/css/tailwind.css --minify --verbose)",
-      "Bash(node_modules/.bin/tailwindcss --help)"
+      "Bash(node_modules/.bin/tailwindcss --help)",
+      "Bash(composer --version)",
+      "Bash(php --version)",
+      "Bash(composer require *)",
+      "Bash(php -l \"c:/xampp/htdocs/fine/student/receipt_pdf.php\")",
+      "Bash(php -l \"c:/xampp/htdocs/fine/student/history.php\")",
+      "Bash(grep -r \"TCPDF\\\\|tcpdf\\\\|pdf\" /c/xampp/htdocs/fine --include=\"*.php\" ! -path \"*/node_modules/*\")",
+      "Bash(php -r \"require 'C:/xampp/htdocs/fine/vendor/autoload.php'; echo class_exists\\('TCPDF'\\) ? 'TCPDF OK' : 'NOT FOUND';\")",
+      "Bash(curl -L \"https://github.com/google/fonts/raw/main/ofl/dancingscript/DancingScript-Regular.ttf\" -o \"/c/xampp/htdocs/fine/assets/fonts/DancingScript-Regular.ttf\")",
+      "Bash(php -l \"C:/xampp/htdocs/fine/student/print_receipt.php\")",
+      "Bash(curl -L -A Mozilla/5.0 https://github.com/google/fonts/raw/refs/heads/main/ofl/dancingscript/DancingScript%5Bwght%5D.ttf -o C:/xampp/htdocs/fine/assets/fonts/DancingScript-Regular.ttf)",
+      "Bash(echo \"Exit: $?\")"
     ]
   }
 }
