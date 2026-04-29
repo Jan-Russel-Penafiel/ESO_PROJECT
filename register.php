@@ -102,18 +102,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script>document.getElementById('bi-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';this.replaceWith(l);};</script>
 <style>*, *::before, *::after { border-color: #e2e8f0; }</style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center p-4">
+<body class="min-h-screen bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-start sm:items-center justify-center p-3 sm:p-4">
 
 <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-  <div class="bg-emerald-600 text-white text-center py-6 px-6">
-    <div class="bg-white/20 inline-flex items-center justify-center w-16 h-16 rounded-full mb-2">
+  <div class="bg-emerald-600 text-white text-center py-5 px-6">
+    <div class="bg-white/20 inline-flex items-center justify-center w-14 h-14 rounded-full mb-2">
       <i class="bi bi-person-plus text-3xl"></i>
     </div>
     <h1 class="text-xl font-bold">Student Registration</h1>
     <p class="text-emerald-100 text-xs mt-1">Create your student account</p>
   </div>
 
-  <div class="p-6 space-y-4">
+  <div class="p-4 sm:p-6 space-y-4">
     <?php if ($errors): ?>
       <div class="bg-red-100 border border-red-300 text-red-700 text-sm p-3 rounded">
         <ul class="list-disc list-inside">
@@ -124,105 +124,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     <?php endif; ?>
 
-    <form method="POST" class="space-y-4" id="registerForm">
+    <form method="POST" class="space-y-3" id="registerForm">
       <?= csrf_field() ?>
 
-      <div id="stepPersonal" class="space-y-4">
-        <div class="text-xs font-semibold text-emerald-700 uppercase">Step 1 of 2</div>
+      <div id="stepPersonal" class="space-y-3">
+        <div class="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Step 1 of 2</div>
         <h2 class="text-sm font-semibold text-slate-800">Personal Information</h2>
 
-        <div class="flex flex-col sm:flex-row gap-4">
-          <div class="w-full sm:flex-shrink-0" style="flex:0 0 7rem; max-width:7rem;">
+        <!-- Student No. + Full Name: side-by-side on sm+, stacked on mobile -->
+        <div class="grid grid-cols-1 sm:grid-cols-[7rem_1fr] gap-3">
+          <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Student No. *</label>
             <input type="text" name="student_no" required inputmode="numeric" pattern="\d{5}" minlength="5" maxlength="5"
                    value="<?= e($values['student_no']) ?>"
-                   class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
           </div>
-          <div class="w-full sm:flex-1" style="min-width:0;">
+          <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Full Name *</label>
             <input type="text" name="full_name" required
                    value="<?= e($values['full_name']) ?>"
-                   class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row gap-4">
-          <div class="w-full sm:w-2/3">
+
+        <!-- Email + Contact: side-by-side on sm+, stacked on mobile -->
+        <div class="grid grid-cols-1 sm:grid-cols-[1fr_9rem] gap-3">
+          <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Email *</label>
             <input type="email" name="email" required
                    value="<?= e($values['email']) ?>"
-                   class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
           </div>
-          <div class="w-full sm:flex-shrink-0" style="flex:0 0 9.25rem; max-width:9.25rem;">
+          <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Contact</label>
             <input type="text" name="contact" inputmode="numeric" pattern="\d{11}" minlength="11" maxlength="11"
                    value="<?= e($values['contact']) ?>"
-                   class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row gap-4">
-          <div class="flex-1">
+
+        <!-- Course + Year + Section: on mobile Course full-width, Year+Section in a row -->
+        <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_3.5rem] gap-3">
+          <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Course</label>
             <select name="course"
-                    class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+                    class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none bg-white">
               <option value="">Select course</option>
               <?php foreach (['BSCPE', 'BSCE', 'BSECE'] as $opt): ?>
                 <option value="<?= $opt ?>" <?= $values['course'] === $opt ? 'selected' : '' ?>><?= $opt ?></option>
               <?php endforeach; ?>
             </select>
           </div>
-          <div class="flex-1">
-            <label class="block text-sm font-medium text-slate-700 mb-1">Year Level</label>
-            <select name="year_level"
-                    class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
-              <option value="">Select year level</option>
-              <?php foreach (['1', '2', '3', '4'] as $opt): ?>
-                <option value="<?= $opt ?>" <?= $values['year_level'] === $opt ? 'selected' : '' ?>><?= $opt ?></option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-          <div class="flex-shrink-0" style="flex:0 0 3rem; max-width:3rem;">
-            <label class="block text-sm font-medium text-slate-700 mb-1">Section</label>
-            <input type="text" name="section" maxlength="1" pattern="[A-Za-z]" inputmode="text"
-                   value="<?= e($values['section']) ?>"
-                   class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+          <div class="grid grid-cols-[1fr_4rem] sm:contents gap-3">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Year Level</label>
+              <select name="year_level"
+                      class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none bg-white">
+                <option value="">Select year</option>
+                <?php foreach (['1', '2', '3', '4'] as $opt): ?>
+                  <option value="<?= $opt ?>" <?= $values['year_level'] === $opt ? 'selected' : '' ?>><?= $opt ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Section</label>
+              <input type="text" name="section" maxlength="1" pattern="[A-Za-z]" inputmode="text"
+                     value="<?= e($values['section']) ?>"
+                     class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base text-center focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+            </div>
           </div>
         </div>
 
         <button type="button" id="toAccount"
-                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
-          Next
+                class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2 text-base">
+          Next <i class="bi bi-arrow-right"></i>
         </button>
       </div>
 
-      <div id="stepAccount" class="space-y-4 hidden">
-        <div class="text-xs font-semibold text-emerald-700 uppercase">Step 2 of 2</div>
+      <div id="stepAccount" class="space-y-3 hidden">
+        <div class="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Step 2 of 2</div>
         <h2 class="text-sm font-semibold text-slate-800">Account Information</h2>
 
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">Username *</label>
-          <input type="text" name="username" required
+          <input type="text" name="username" required autocomplete="username"
                  value="<?= e($values['username']) ?>"
-                 class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+                 class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">Password *</label>
-          <input type="password" name="password" required
-                 class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+          <input type="password" name="password" required autocomplete="new-password"
+                 class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">Confirm Password *</label>
-          <input type="password" name="password_confirm" required
-                 class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+          <input type="password" name="password_confirm" required autocomplete="new-password"
+                 class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="grid grid-cols-2 gap-3 pt-1">
           <button type="button" id="backPersonal"
-                  class="w-full border border-slate-300 text-slate-700 font-semibold py-2.5 rounded-lg transition">
-            Back
+                  class="w-full border border-slate-300 text-slate-700 font-semibold py-3 rounded-lg transition active:bg-slate-50 flex items-center justify-center gap-2 text-base">
+            <i class="bi bi-arrow-left"></i> Back
           </button>
           <button type="submit"
-                  class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
-            <i class="bi bi-check2-circle"></i> Create Account
+                  class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2 text-base">
+            <i class="bi bi-check2-circle"></i> Register
           </button>
         </div>
       </div>
@@ -230,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="text-sm text-slate-500 text-center border-t pt-3">
       Already have an account?
-      <a href="<?= APP_URL ?>/index.php" class="text-emerald-700 hover:underline">Sign in</a>
+      <a href="<?= APP_URL ?>/index.php" class="text-emerald-700 hover:underline font-medium">Sign in</a>
     </div>
   </div>
 </div>
