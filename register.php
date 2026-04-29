@@ -43,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($password === '') {
         $errors[] = 'Password is required.';
-    } elseif (strlen($password) < 6) {
-        $errors[] = 'Password must be at least 6 characters.';
+    } elseif (strlen($password) < 8) {
+        $errors[] = 'Password must be at least 8 characters.';
     }
     if ($password !== $passwordConfirm) {
         $errors[] = 'Passwords do not match.';
@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <label class="block text-sm font-medium text-slate-700 mb-1">Section</label>
               <input type="text" name="section" maxlength="1" pattern="[A-Za-z]" inputmode="text"
                      value="<?= e($values['section']) ?>"
-                     class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base text-center focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
+                     class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
             </div>
           </div>
         </div>
@@ -213,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">Password *</label>
-          <input type="password" name="password" required autocomplete="new-password"
+          <input type="password" name="password" required autocomplete="new-password" minlength="8"
                  class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:border-emerald-500 focus:ring focus:ring-emerald-200 outline-none">
         </div>
         <div>
