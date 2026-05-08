@@ -63,7 +63,7 @@ include __DIR__ . '/../templates/sidebar.php';
         <p class="text-2xl font-bold text-green-700"><?= peso($paidFines['a']) ?></p>
         <p class="text-xs text-slate-500"><?= e($paidFines['c']) ?> paid</p>
       </div>
-      <i class="bi bi-check-circle text-3xl text-green-300"></i>
+      <i class="bi bi-cash-stack text-3xl text-green-300"></i>
     </div>
   </div>
 

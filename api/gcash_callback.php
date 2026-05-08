@@ -58,7 +58,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'confi
 <!-- Bootstrap Icons: local, CDN fallback if missing -->
 <link id="bi-css" rel="stylesheet" href="<?= APP_URL ?>/assets/css/bootstrap-icons.min.css">
 <script>document.getElementById('bi-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';this.replaceWith(l);};</script>
-<style>*, *::before, *::after { border-color: #e2e8f0; }</style>
+<style>
+  :root {
+    --color-emerald-50: #fff5f5;
+    --color-emerald-100: #ffe6e6;
+    --color-emerald-200: #ffcccc;
+    --color-emerald-300: #ff9999;
+    --color-emerald-400: #ff6666;
+    --color-emerald-500: #cc3333;
+    --color-emerald-600: #8b0000;
+    --color-emerald-700: #6f0000;
+    --color-emerald-800: #520000;
+    --color-sky-50: #fff5f5;
+    --color-sky-100: #ffe6e6;
+    --color-sky-200: #ffcccc;
+    --color-sky-300: #ff9999;
+    --color-sky-500: #cc3333;
+    --color-sky-600: #8b0000;
+    --color-sky-700: #6f0000;
+    --color-sky-800: #520000;
+    --color-green-300: #ff9999;
+    --color-green-600: #8b0000;
+    --color-green-700: #6f0000;
+  }
+  *, *::before, *::after { border-color: #f1cdd5; }
+  .bi-check::before,
+  .bi-check-circle::before,
+  .bi-check2-circle::before,
+  .bi-check2::before,
+  .bi-check-lg::before,
+  .bi-check2-all::before,
+  .bi-check-all::before,
+  .bi-shield-check::before {
+    content: "";
+    display: inline-block;
+    width: 2em;
+    height: 2em;
+    background: url("<?= APP_URL ?>/eso.jpg") center/cover no-repeat;
+    border-radius: 9999px;
+    vertical-align: -0.25em;
+  }
+</style>
 </head>
 <body class="bg-gradient-to-br from-sky-600 to-sky-800 min-h-screen flex items-center justify-center p-4">
 
